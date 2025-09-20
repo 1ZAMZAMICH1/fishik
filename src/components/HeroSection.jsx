@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import backgroundImage from '../assets/fishing-background.jpg';
-import catfishImage from '../assets/catfish.png';
+import backgroundImage from '/assets/fishing-background.jpg';
+import catfishImage from '/assets/catfish.png';
 
 const SvgDefinitions = () => ( <svg width="0" height="0" style={{ position: 'absolute' }}> <defs> <clipPath id="wave-clip-path" clipPathUnits="objectBoundingBox"> <path d="M 0,0 H 0.8 C 0.7,0.2 0.85,0.4 0.75,0.5 S 0.7,0.8 0.8,1 H 0 Z" /> </clipPath> </defs> </svg> );
 
