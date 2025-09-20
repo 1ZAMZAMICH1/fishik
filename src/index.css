@@ -1,0 +1,81 @@
+/* --- ФИНАЛЬНЫЙ INDEX.CSS ДЛЯ СТАБИЛЬНОГО МАСШТАБА НА ВСЕХ УСТРОЙСТВАХ --- */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+
+:root {
+  font-family: 'Montserrat', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* 
+    1. БАЗА: Для обычных экранов с масштабом 100% (1dppx),
+       мы искусственно увеличиваем все на 25%.
+       Результат: Выглядит как при 125%.
+  */
+  font-size: 125%;
+}
+
+/* 
+   2. КОМПЕНСАЦИЯ: Ниже идут правила, которые отменяют и заменяют
+      базовое увеличение для экранов с системным масштабом.
+      Они должны идти в строгом порядке, от меньшего к большему.
+*/
+
+/* Для масштаба 125% (1.25dppx) */
+@media (min-resolution: 1.25dppx) {
+  :root {
+    /* Системный зум 125% * наш зум 100% = 125%. Все ок. */
+    font-size: 100%;
+  }
+}
+
+/* Для масштаба 150% (1.5dppx) */
+@media (min-resolution: 1.5dppx) {
+  :root {
+    /* Системный зум 150% * наш зум 83.33% = 125%. Все ок. */
+    font-size: 83.333%;
+  }
+}
+
+/* Для масштаба 175% (1.75dppx) */
+@media (min-resolution: 1.75dppx) {
+  :root {
+    /* Системный зум 175% * наш зум 71.428% = 125%. Все ок. */
+    font-size: 71.428%;
+  }
+}
+
+/* Для масштаба 200% (2dppx) */
+@media (min-resolution: 2dppx) {
+  :root {
+    /* Системный зум 200% * наш зум 62.5% = 125%. Все ок. */
+    font-size: 62.5%;
+  }
+}
+
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* Остальные стандартные стили Vite */
+a { font-weight: 500; color: #646cff; text-decoration: inherit; }
+a:hover { color: #535bf2; }
+h1 { font-size: 3.2em; line-height: 1.1; }
+button { border-radius: 8px; border: 1px solid transparent; padding: 0.6em 1.2em; font-size: 1em; font-weight: 500; font-family: inherit; background-color: #1a1a1a; cursor: pointer; transition: border-color 0.25s; }
+button:hover { border-color: #646cff; }
+button:focus, button:focus-visible { outline: 4px auto -webkit-focus-ring-color; }
+@media (prefers-color-scheme: light) {
+  :root { color: #213547; background-color: #ffffff; }
+  a:hover { color: #747bff; }
+  button { background-color: #f9f9f9; }
+}
