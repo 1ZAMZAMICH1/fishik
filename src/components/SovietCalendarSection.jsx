@@ -40,7 +40,7 @@ const SectionContainer = styled.section`
 
   @media (max-width: 48rem) {
     padding: 1.5rem;
-    height: auto; /* Высота по контенту */
+    height: auto;
   }
 `;
 
@@ -78,13 +78,10 @@ const LayoutGrid = styled.div`
   align-items: center;
   width: 100%;
   max-width: 93.75rem;
-  position: relative;
-  bottom: 3rem;
   
   @media (max-width: 48rem) {
-    grid-template-columns: 1fr; /* Ставим в колонку */
+    grid-template-columns: 1fr;
     gap: 3rem;
-    bottom: 0;
   }
 `;
 
@@ -108,8 +105,9 @@ const DialTitle = styled.h3`
 
 const CalendarDial = styled.div`
   position: relative;
-  width: 31.25rem;
-  height: 31.25rem;
+  /* ИЗМЕНЕНИЕ: Возвращаем большой размер для ПК */
+  width: 37.5rem;
+  height: 37.5rem;
   border: 2px solid #E5E7EB;
   border-radius: 50%;
   display: flex;
@@ -120,7 +118,6 @@ const CalendarDial = styled.div`
   box-shadow: 0 1.25rem 3.125rem rgba(0,0,0,0.08);
 
   @media (max-width: 48rem) {
-    /* Гибкие размеры, зависящие от ширины экрана */
     width: clamp(18.75rem, 80vmin, 25rem);
     height: clamp(18.75rem, 80vmin, 25rem);
   }
@@ -128,12 +125,13 @@ const CalendarDial = styled.div`
 
 const DialButton = styled.button`
   position: absolute;
-  width: 5rem;
-  height: 2rem;
+  /* ИЗМЕНЕНИЕ: Возвращаем большой размер для ПК */
+  width: 6.25rem;
+  height: 2.5rem;
   background: #fff;
   border: 1px solid #E5E7EB;
   color: #4B5563;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 700;
   border-radius: 0.25rem;
   cursor: pointer;
@@ -158,6 +156,19 @@ const DialButton = styled.button`
     width: 2.5rem;
     height: 2.5rem;
     font-size: 0.875rem;
+  }
+  
+  /* Стили для мобильных остаются прежними */
+  @media (max-width: 48rem) {
+    width: 5rem;
+    height: 2rem;
+    font-size: 0.75rem;
+
+    &.day-button {
+      width: 2.5rem;
+      height: 2.5rem;
+      font-size: 0.875rem;
+    }
   }
 `;
 
@@ -312,7 +323,15 @@ const NavButtonSmall = styled.button`
 // --- ОСНОВНОЙ КОМПОНЕНТ ---
 const SovietCalendarSection = () => {
   const { appData } = useData();
+  const [isMobile, setIsMobile] = useState(false);
   
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   if (!appData || !appData.fishingData) {
     return ( <section style={{height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Montserrat', fontSize: '1.25rem'}}> Загрузка календаря... </section> );
   }
@@ -332,8 +351,8 @@ const SovietCalendarSection = () => {
   const selectedFullDate = new Date(lunarDate.getFullYear(), lunarDate.getMonth(), selectedDay);
   const moonDataForSelectedDay = getMoonData(selectedFullDate);
 
-  // Динамическое расстояние для кнопок
-  const dialRadiusInRem = { desktop: 15.625, mobile: '36vmin' };
+  // ИЗМЕНЕНИЕ: Возвращаем большой радиус для ПК
+  const dialRadius = { desktop: '18.5rem', mobile: '36vmin' };
 
   return (
     <SectionContainer>
@@ -347,14 +366,11 @@ const SovietCalendarSection = () => {
             <CalendarDial>
               {months.map((month, index) => {
                 const angle = (index / 12) * 360;
-                const rotation = `rotate(${angle}deg) translate(calc(${dialRadiusInRem.desktop}rem - 50%)) rotate(-${angle}deg)`;
-                const mobileRotation = `rotate(${angle}deg) translate(${dialRadiusInRem.mobile}) rotate(-${angle}deg)`;
+                const rotation = `rotate(${angle}deg) translate(${isMobile ? dialRadius.mobile : dialRadius.desktop}) rotate(-${angle}deg)`;
                 
                 return (
                   <DialButton key={month} className={selectedFishMonth === month ? 'active' : ''}
-                    style={{
-                      transform: window.innerWidth <= 768 ? mobileRotation : rotation
-                    }}
+                    style={{ transform: rotation }}
                     onClick={() => setSelectedFishMonth(month)}
                   >
                     {month.toUpperCase()}
@@ -376,12 +392,11 @@ const SovietCalendarSection = () => {
             <CalendarDial>
               {Array.from({ length: daysInCurrentMonth }, (_, i) => i + 1).map((day, index) => {
                 const angle = (index / daysInCurrentMonth) * 360;
-                const rotation = `rotate(${angle}deg) translate(calc(${dialRadiusInRem.desktop}rem - 50%)) rotate(-${angle}deg)`;
-                const mobileRotation = `rotate(${angle}deg) translate(${dialRadiusInRem.mobile}) rotate(-${angle}deg)`;
-
+                const rotation = `rotate(${angle}deg) translate(${isMobile ? dialRadius.mobile : dialRadius.desktop}) rotate(-${angle}deg)`;
+                
                 return (
                   <DialButton key={day} className={`day-button ${selectedDay === day ? 'active' : ''}`}
-                    style={{ transform: window.innerWidth <= 768 ? mobileRotation : rotation }}
+                    style={{ transform: rotation }}
                     onClick={() => setSelectedDay(day)}
                   >
                     {day}
