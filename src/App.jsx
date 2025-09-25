@@ -24,6 +24,12 @@ import EditArticles from './components/admin/EditArticles';
 import EditBanner from './components/admin/EditBanner';
 import EditCalendar from './components/admin/EditCalendar';
 import EditModals from './components/admin/EditModals';
+import EditMap from './components/admin/EditMap';
+
+// Импорты для аутентификации
+import Login from './components/admin/Login';
+import ProtectedRoute from './components/admin/ProtectedRoute';
+
 
 import './App.css';
 
@@ -52,15 +58,21 @@ function App() {
             <Route path="/map" element={<HydrographyAtlas />} />
             <Route path="/articles" element={<AllArticlesPage />} />
             
-            {/* Роуты для админки */}
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<EditLocations />} />
-              <Route path="locations" element={<EditLocations />} />
-              <Route path="modals" element={<EditModals />} />
-              <Route path="fish" element={<EditFish />} />
-              <Route path="articles" element={<EditArticles />} />
-              <Route path="banner" element={<EditBanner />} />
-              <Route path="calendar" element={<EditCalendar />} />
+            {/* Роут для страницы входа */}
+            <Route path="/login" element={<Login />} />
+            
+            {/* Защищенные роуты для админки */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<EditLocations />} />
+                <Route path="locations" element={<EditLocations />} />
+                <Route path="modals" element={<EditModals />} />
+                <Route path="map-data" element={<EditMap />} />
+                <Route path="fish" element={<EditFish />} />
+                <Route path="articles" element={<EditArticles />} />
+                <Route path="banner" element={<EditBanner />} />
+                <Route path="calendar" element={<EditCalendar />} />
+              </Route>
             </Route>
           </Routes>
         </div>

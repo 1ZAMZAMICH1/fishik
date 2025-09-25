@@ -13,9 +13,14 @@ const EditModals = () => {
     title: '', tagline: '', cardTitle: '', description: '', image: '',
     lat: '', lon: '', fish: 'Название1, ссылка1.png\nНазвание2, ссылка2.png',
     cardPosition: 'center', mapEmbedCode: '',
+    // --- ИЗМЕНЕННЫЕ ПОЛЯ ---
+    waterLevel: '', 
+    waterLevelDynamics: '', 
+    waterLevelUpdate: '',
   };
   const [formData, setFormData] = useState(initialFormData);
 
+  // ... (остальные функции остаются без изменений) ...
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -71,7 +76,8 @@ const EditModals = () => {
   
   const handleEditClick = (item) => {
     setEditingItem(item);
-    setFormData({ ...item, fish: formatFishDataForEdit(item.fish) });
+    // Важно: обеспечиваем, чтобы все поля были в форме, даже если их нет в старых данных
+    setFormData({ ...initialFormData, ...item, fish: formatFishDataForEdit(item.fish) });
   };
 
   const handleDeleteLocation = async (idToDelete) => {
@@ -125,8 +131,14 @@ const EditModals = () => {
   const formFields = [
     { name: 'title', label: 'Полное название', type: 'text' }, { name: 'cardTitle', label: 'Название на карточке', type: 'text' },
     { name: 'tagline', label: 'Слоган (желтый текст)', type: 'text' }, { name: 'image', label: 'Ссылка (URL) на фото', type: 'text' },
-    { name: 'description', label: 'Описание', type: 'textarea' }, { name: 'lat', label: 'Широта (для погоды)', type: 'text' },
-    { name: 'lon', label: 'Долгота (для погоды)', type: 'text' }, { name: 'cardPosition', label: 'Позиция фото на карточке', type: 'text' },
+    { name: 'lat', label: 'Широта (для погоды)', type: 'text' }, { name: 'lon', label: 'Долгота (для погоды)', type: 'text' },
+    // --- НОВЫЕ ПОЛЯ ДЛЯ УРОВНЯ ВОДЫ ---
+    { name: 'waterLevel', label: 'Уровень воды (например, 280 см)', type: 'text' },
+    { name: 'waterLevelDynamics', label: 'Динамика (например, +5 см/сутки)', type: 'text' },
+    { name: 'waterLevelUpdate', label: 'Дата обновления данных', type: 'text' },
+    // ------------------------------------
+    { name: 'cardPosition', label: 'Позиция фото на карточке', type: 'text' },
+    { name: 'description', label: 'Описание', type: 'textarea' },
     { name: 'fish', label: 'Рыбы (каждая с новой строки, формат: Название, ссылка.png)', type: 'textarea' },
     { name: 'mapEmbedCode', label: 'HTML-код для вставки карты', type: 'textarea' },
   ];
@@ -135,8 +147,16 @@ const EditModals = () => {
     <div className="form-container">
         <h3>{editingItem ? 'Редактировать локацию' : 'Добавить новую локацию'}</h3>
         <div className="form-grid">
-          {formFields.filter(f => f.type === 'text').map(field => ( <div className="form-group" key={field.name}><label>{field.label}</label><input className="form-input" type="text" name={field.name} value={formData[field.name]} onChange={handleInputChange} /></div> ))}
-          {formFields.filter(f => f.type === 'textarea').map(field => ( <div className="form-group full-width" key={field.name}><label>{field.label}</label><textarea className="form-textarea" name={field.name} value={formData[field.name]} onChange={handleInputChange}></textarea></div> ))}
+          {formFields.map(field => (
+            <div className={`form-group ${field.type === 'textarea' ? 'full-width' : ''}`} key={field.name}>
+              <label>{field.label}</label>
+              {field.type === 'textarea' ? (
+                <textarea className="form-textarea" name={field.name} value={formData[field.name]} onChange={handleInputChange}></textarea>
+              ) : (
+                <input className="form-input" type="text" name={field.name} value={formData[field.name]} onChange={handleInputChange} />
+              )}
+            </div>
+          ))}
         </div>
         <button className="save-button" onClick={() => handleSave(!editingItem)} disabled={status === 'saving'}>{status === 'saving' ? 'Сохранение...' : (editingItem ? 'Сохранить изменения' : 'Добавить локацию')}</button>
         {editingItem && <button style={{marginLeft: '10px'}} onClick={() => { setEditingItem(null); setFormData(initialFormData); }}>Отмена</button>}
@@ -145,9 +165,7 @@ const EditModals = () => {
 
   return (
     <div className="edit-page-container">
-      {/* --- ВОТ СТРОКА, КОТОРУЮ Я ЗАБЫЛ. БОЛЬШЕ НЕ ЗАБУДУ. --- */}
       <style>{styles}</style>
-
       <h1 className="page-title">Управление Локациями (для Модальных окон)</h1>
       {editForm}
       <div className="existing-data-container">

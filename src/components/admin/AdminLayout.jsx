@@ -1,9 +1,9 @@
 // src/components/admin/AdminLayout.jsx
 
 import React from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { FaFish, FaMapMarkedAlt, FaNewspaper, FaCalendarAlt, FaHome, FaExclamationCircle } from 'react-icons/fa';
+import { FaFish, FaMapMarkedAlt, FaNewspaper, FaCalendarAlt, FaHome, FaExclamationCircle, FaSignOutAlt, FaGlobeEurope } from 'react-icons/fa';
 
 // --- СТИЛИЗОВАННЫЕ КОМПОНЕНТЫ ---
 
@@ -65,7 +65,7 @@ const AdminNav = styled.ul`
   flex-direction: column;
   gap: 10px;
 
-  a {
+  a, button {
     display: flex;
     align-items: center;
     gap: 15px;
@@ -76,8 +76,14 @@ const AdminNav = styled.ul`
     font-weight: 700;
     transition: all 0.2s ease;
     font-size: 16px;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
   }
-  a:hover {
+  a:hover, button:hover {
     background-color: #f0f4f8;
     color: #1A2E40;
   }
@@ -95,7 +101,7 @@ const AdminNav = styled.ul`
     padding: 0.5rem;
     gap: 0;
     
-    a {
+    a, button {
       flex-direction: column;
       padding: 0.5rem;
       gap: 4px;
@@ -205,6 +211,13 @@ const AdminContent = styled.main`
 `;
 
 const AdminLayout = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAdminAuthenticated');
+    navigate('/login');
+  };
+
   return (
     <AdminPanel>
       <AdminSidebar>
@@ -214,10 +227,17 @@ const AdminLayout = () => {
         <AdminNav>
           <li><NavLink to="/admin/locations"><span className="nav-icon"><FaMapMarkedAlt/></span><span className="nav-text">Локации (Главная)</span></NavLink></li>
           <li><NavLink to="/admin/modals"><span className="nav-icon"><FaMapMarkedAlt/></span><span className="nav-text">Локации (Модалки)</span></NavLink></li>
+          <li><NavLink to="/admin/map-data"><span className="nav-icon"><FaGlobeEurope/></span><span className="nav-text">Данные Карты</span></NavLink></li>
           <li><NavLink to="/admin/fish"><span className="nav-icon"><FaFish/></span><span className="nav-text">Энциклопедия Рыб</span></NavLink></li>
           <li><NavLink to="/admin/articles"><span className="nav-icon"><FaNewspaper/></span><span className="nav-text">Статьи</span></NavLink></li>
           <li><NavLink to="/admin/banner"><span className="nav-icon"><FaExclamationCircle/></span><span className="nav-text">Инфо-баннер</span></NavLink></li>
           <li><NavLink to="/admin/calendar"><span className="nav-icon"><FaCalendarAlt/></span><span className="nav-text">Календарь Клёва</span></NavLink></li>
+          <li>
+            <button onClick={handleLogout}>
+              <span className="nav-icon"><FaSignOutAlt /></span>
+              <span className="nav-text">Выйти</span>
+            </button>
+          </li>
         </AdminNav>
         <AdminSidebarFooter>
           <a href="/"><FaHome/>Вернуться на сайт</a>

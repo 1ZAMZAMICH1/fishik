@@ -11,8 +11,16 @@ const EditFish = () => {
   const [status, setStatus] = useState('idle');
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
-    name: '', description: '', habitat: '', tackle: '', bait: '', image: '',
-    difficulty: 1, peakTime: [], biteMonths: [],
+    name: '',
+    description: '',
+    habitat: '',
+    tackle: '',
+    bait: '',
+    image: '',
+    locations: '', // Новое поле
+    difficulty: 1,
+    peakTime: [],
+    biteMonths: [],
   });
 
   const handleInputChange = (e) => {
@@ -34,7 +42,18 @@ const EditFish = () => {
     try {
       await saveData(updatedData);
       setAppData(updatedData);
-      setFormData({ name: '', description: '', habitat: '', tackle: '', bait: '', image: '', difficulty: 1, peakTime: [], biteMonths: [] });
+      setFormData({
+        name: '',
+        description: '',
+        habitat: '',
+        tackle: '',
+        bait: '',
+        image: '',
+        locations: '', // Сброс нового поля
+        difficulty: 1,
+        peakTime: [],
+        biteMonths: [],
+      });
       setStatus('idle');
       alert('Новая рыба успешно добавлена!');
     } catch (error) {
@@ -83,6 +102,7 @@ const EditFish = () => {
     { name: 'habitat', label: 'Среда обитания', type: 'textarea' },
     { name: 'tackle', label: 'Снасти', type: 'textarea' },
     { name: 'bait', label: 'Наживка', type: 'textarea' },
+    { name: 'locations', label: 'Основные места', type: 'textarea' }, // Новое поле для модального окна
   ];
 
   const styles = `
@@ -94,9 +114,9 @@ const EditFish = () => {
     .full-width { grid-column: 1 / -1; }
     .form-group label { font-weight: 700; margin-bottom: 8px; color: #4B5563; display: block; font-size: 14px; }
     .form-input, .form-textarea { width: 100%; box-sizing: border-box; padding: 12px 15px; border: 1px solid #E5E7EB; border-radius: 6px; font-family: 'Montserrat', sans-serif; font-size: 16px; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
-    .form-input:focus, .form-textarea:focus { outline: none; border-color: #F2994A; box-shadow: 0 0 0 3px rgba(242, 153, 74, 0.2); }
+    .form-input:focus, .form-textarea:focus { outline: none; border-color: #F29A4A; box-shadow: 0 0 0 3px rgba(242, 153, 74, 0.2); }
     .form-textarea { min-height: 100px; resize: vertical; }
-    .save-button { margin-top: 25px; padding: 12px 25px; background-color: #F2994A; color: #1A2E40; border: none; border-radius: 6px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; }
+    .save-button { margin-top: 25px; padding: 12px 25px; background-color: #F29A4A; color: #1A2E40; border: none; border-radius: 6px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; }
     .save-button:hover { background-color: #e88c3a; }
     .save-button:disabled { background-color: #ccc; cursor: not-allowed; }
     .existing-data-container { background-color: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
@@ -120,10 +140,10 @@ const EditFish = () => {
   `;
 
   if (!appData) return <div className="status-message">Загрузка...</div>;
-  
+
   const fishArray = appData.fishData || [];
   const months = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
-  const times = [ { icon: <FiSunrise />, period: 'morning' }, { icon: <FiSun />, period: 'day' }, { icon: <FiSunset />, period: 'evening' }, { icon: <FiMoon />, period: 'night' }];
+  const times = [{ icon: <FiSunrise />, period: 'morning' }, { icon: <FiSun />, period: 'day' }, { icon: <FiSunset />, period: 'evening' }, { icon: <FiMoon />, period: 'night' }];
 
   return (
     <div className="edit-page-container">
@@ -132,15 +152,16 @@ const EditFish = () => {
       <div className="form-container">
         <h3>Добавить новый вид рыбы</h3>
         <div className="form-grid">
-          <div className="form-group"><label>Название</label><input className="form-input" type="text" name="name" value={formData.name} onChange={handleInputChange}/></div>
-          <div className="form-group"><label>Ссылка (URL) на фото</label><input className="form-input" type="text" name="image" value={formData.image} onChange={handleInputChange}/></div>
+          <div className="form-group"><label>Название</label><input className="form-input" type="text" name="name" value={formData.name} onChange={handleInputChange} /></div>
+          <div className="form-group"><label>Ссылка (URL) на фото</label><input className="form-input" type="text" name="image" value={formData.image} onChange={handleInputChange} /></div>
           <div className="form-group full-width"><label>Описание</label><textarea className="form-textarea" name="description" value={formData.description} onChange={handleInputChange}></textarea></div>
           <div className="form-group"><label>Среда обитания</label><textarea className="form-textarea" name="habitat" value={formData.habitat} onChange={handleInputChange}></textarea></div>
           <div className="form-group"><label>Снасти</label><textarea className="form-textarea" name="tackle" value={formData.tackle} onChange={handleInputChange}></textarea></div>
-          <div className="form-group full-width"><label>Наживка</label><textarea className="form-textarea" name="bait" value={formData.bait} onChange={handleInputChange}></textarea></div>
+          <div className="form-group"><label>Наживка</label><textarea className="form-textarea" name="bait" value={formData.bait} onChange={handleInputChange}></textarea></div>
+          <div className="form-group full-width"><label>Основные места</label><textarea className="form-textarea" name="locations" value={formData.locations} onChange={handleInputChange}></textarea></div>
         </div>
-        <div className="form-group full-width widget-grid" style={{marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e5e7eb'}}>
-          <div className="widget-editor"><label>Сложность</label><div className="stars">{[1, 2, 3].map(level => (<span key={level} onClick={() => handleDifficultyChange(level)}>{formData.difficulty >= level ? <BsStarFill className="active"/> : <BsStar />}</span>))}</div></div>
+        <div className="form-group full-width widget-grid" style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e5e7eb' }}>
+          <div className="widget-editor"><label>Сложность</label><div className="stars">{[1, 2, 3].map(level => (<span key={level} onClick={() => handleDifficultyChange(level)}>{formData.difficulty >= level ? <BsStarFill className="active" /> : <BsStar />}</span>))}</div></div>
           <div className="widget-editor"><label>Время клёва</label><div className="time-icons">{times.map(t => (<span key={t.period} onClick={() => handlePeakTimeChange(t.period)}>{React.cloneElement(t.icon, { className: formData.peakTime.includes(t.period) ? 'active' : '' })}</span>))}</div></div>
         </div>
         <div className="form-group full-width">

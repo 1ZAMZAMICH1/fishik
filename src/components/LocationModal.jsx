@@ -4,6 +4,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import WeatherWidget from './WeatherWidget';
+import WaterLevelWidget from './WaterLevelWidget'; // <-- ИМПОРТ НОВОГО КОМПОНЕНТА
 
 // --- СТИЛИЗОВАННЫЕ КОМПОНЕНТЫ ---
 
@@ -77,7 +78,7 @@ const ModalCloseButton = styled.button`
 const ModalScrollContainer = styled.div`
   flex-grow: 1;
   overflow-y: auto;
-  padding: 90px 40px;
+  padding: 40px;
 
   @media (max-width: 48rem) {
     padding: 2rem 1.5rem;
@@ -150,30 +151,15 @@ const FishName = styled.p`
 
 const BottomBlock = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr); /* <-- ИЗМЕНЕНО: 3 колонки */
   gap: 30px;
 
-  @media (max-width: 48rem) {
-    grid-template-columns: 1fr; /* Ставим в колонку */
+  @media (max-width: 75rem) { /* <-- ИЗМЕНЕНО: адаптивность для планшетов и мобильных */
+    grid-template-columns: 1fr;
   }
 `;
 
-const MapContainer = styled.div`
-  background: #263238;
-  border-radius: 4px;
-  overflow: hidden;
-  height: 100%;
-  min-height: 250px; /* Чтобы карта не схлопывалась */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-  }
-`;
+// Старый компонент MapContainer удален, так как его стили теперь применяются напрямую или находятся внутри виджетов
 
 const LocationModal = ({ location, onClose }) => {
   return (
@@ -218,10 +204,22 @@ const LocationModal = ({ location, onClose }) => {
           <BottomBlock>
             <div>
               <h4>Карта:</h4>
-              <MapContainer
+              <div 
+                style={{ background: '#263238', borderRadius: '4px', height: '100%', minHeight: '250px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 dangerouslySetInnerHTML={{ __html: location.mapEmbedCode || '<div style="color: #78909C; font-weight: 700;">Карта скоро появится</div>' }} 
               />
             </div>
+            
+            <div>
+              <h4>Уровень воды:</h4>
+              {/* --- ИСПОЛЬЗОВАНИЕ НОВОГО ВИДЖЕТА --- */}
+              <WaterLevelWidget 
+                level={location.waterLevel}
+                dynamics={location.waterLevelDynamics}
+                lastUpdated={location.waterLevelUpdate}
+              />
+            </div>
+            
             <div>
               <h4>Прогноз погоды:</h4>
               <WeatherWidget lat={location.lat} lon={location.lon} />

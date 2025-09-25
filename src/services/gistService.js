@@ -1,14 +1,11 @@
 // src/services/gistService.js
 
-// ▼▼▼ ВСТАВЬТЕ СЮДА ВАШИ ДАННЫЕ ▼▼▼
 const GIST_ID = 'f5b24a10dcb5eb943f12e5dac1a43d07';
 const GITHUB_TOKEN = import.meta.env.VITE_GIST_TOKEN;
-// ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
 const GIST_URL = `https://api.github.com/gists/${GIST_ID}`;
 const FILENAME = 'fishing_data.json';
 
-// Функция для получения данных с Gist (уже должна быть у вас)
 export const fetchData = async () => {
   try {
     const response = await fetch(GIST_URL, {
@@ -33,7 +30,6 @@ export const fetchData = async () => {
   }
 };
 
-// Функция для сохранения (добавления) данных
 export const saveData = async (allData) => {
   try {
     const response = await fetch(GIST_URL, {
@@ -62,11 +58,6 @@ export const saveData = async (allData) => {
   }
 };
 
-// --- НЕДОСТАЮЩАЯ ФУНКЦИЯ, КОТОРУЮ НУЖНО ДОБАВИТЬ ---
-// Технически, она делает то же самое, что и saveData, но мы используем
-// разные имена для семантической ясности в коде админки.
 export const updateData = async (allData) => {
-  // Эта функция полностью идентична saveData, так как PATCH-запрос к Gist
-  // всегда перезаписывает файл целиком.
   return await saveData(allData);
 };
