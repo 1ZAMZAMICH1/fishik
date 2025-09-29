@@ -1,10 +1,11 @@
 // src/components/LocationModal.jsx
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import WeatherWidget from './WeatherWidget';
-import WaterLevelWidget from './WaterLevelWidget'; // <-- ИМПОРТ НОВОГО КОМПОНЕНТА
+import WaterLevelWidget from './WaterLevelWidget';
+import BiteForecastChart from './BiteForecastChart'; // Импортируем новый компонент-график
 
 // --- СТИЛИЗОВАННЫЕ КОМПОНЕНТЫ ---
 
@@ -32,7 +33,6 @@ const ModalContent = styled(motion.div)`
   display: flex;
   flex-direction: column;
   position: relative;
-
   @media (max-width: 48rem) {
     width: 100%;
     height: 100%;
@@ -46,9 +46,8 @@ const ModalHeader = styled.img`
   height: 40%;
   object-fit: cover;
   flex-shrink: 0;
-
   @media (max-width: 48rem) {
-    height: 30%; /* Уменьшаем шапку на мобильных */
+    height: 30%;
   }
 `;
 
@@ -69,7 +68,6 @@ const ModalCloseButton = styled.button`
   align-items: center;
   transition: background 0.3s ease;
   z-index: 10;
-
   &:hover {
     background: #FFAB40;
   }
@@ -79,7 +77,6 @@ const ModalScrollContainer = styled.div`
   flex-grow: 1;
   overflow-y: auto;
   padding: 40px;
-
   @media (max-width: 48rem) {
     padding: 2rem 1.5rem;
   }
@@ -91,7 +88,6 @@ const ModalTitle = styled.h2`
   color: #fff;
   margin: 0 0 15px 0;
   text-align: center;
-
   @media (max-width: 48rem) {
     font-size: 28px;
   }
@@ -104,7 +100,6 @@ const ModalDescription = styled.p`
   max-width: 80%;
   margin: 0 auto 30px auto;
   text-align: center;
-
   @media (max-width: 48rem) {
     max-width: 100%;
     font-size: 15px;
@@ -113,7 +108,6 @@ const ModalDescription = styled.p`
 
 const InfoBlock = styled.div`
   margin-bottom: 30px;
-  
   h4 {
     font-size: 16px;
     font-weight: 700;
@@ -135,6 +129,11 @@ const FishItem = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  &:hover {
+    transform: scale(1.1);
+  }
 `;
 
 const FishIcon = styled.img`
@@ -151,17 +150,148 @@ const FishName = styled.p`
 
 const BottomBlock = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* <-- ИЗМЕНЕНО: 3 колонки */
+  grid-template-columns: repeat(3, 1fr);
   gap: 30px;
-
-  @media (max-width: 75rem) { /* <-- ИЗМЕНЕНО: адаптивность для планшетов и мобильных */
+  @media (max-width: 75rem) {
     grid-template-columns: 1fr;
   }
 `;
 
-// Старый компонент MapContainer удален, так как его стили теперь применяются напрямую или находятся внутри виджетов
+const WidgetContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  & > *:not(h4) {
+    flex-grow: 1;
+  }
+`;
+
+const PopupBackdrop = styled(motion.div)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+`;
+
+const PopupContent = styled(motion.div)`
+  background: #455A64;
+  padding: 30px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  color: #ECEFF1;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  position: relative;
+`;
+
+const PopupCloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  color: #B0BEC5;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  &:hover {
+    color: #fff;
+  }
+`;
+
+const PopupTitle = styled.h3`
+  font-size: 24px;
+  font-weight: 900;
+  color: #FFAB40;
+  margin: 0 0 20px 0;
+  text-align: center;
+`;
+
+const InfoGrid = styled.div`
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 15px;
+`;
+
+const InfoLabel = styled.span`
+  font-weight: 700;
+  color: #90A4AE;
+`;
+
+const InfoValue = styled.span`
+  color: #ECEFF1;
+`;
+
+const Disclaimer = styled.p`
+  font-size: 12px;
+  color: #78909C;
+  text-align: center;
+  margin-top: 25px;
+  font-style: italic;
+`;
+
+const FishInfoPopup = ({ fish, onClose }) => {
+  return (
+    <PopupBackdrop
+      onClick={onClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <PopupContent
+        onClick={(e) => e.stopPropagation()}
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 50, opacity: 0 }}
+      >
+        <PopupCloseButton onClick={onClose}>×</PopupCloseButton>
+        <PopupTitle>{fish.name}</PopupTitle>
+        <InfoGrid>
+          {fish.tackle && ( <> <InfoLabel>Снасти:</InfoLabel> <InfoValue>{fish.tackle}</InfoValue> </> )}
+          {fish.bait && ( <> <InfoLabel>Наживка:</InfoLabel> <InfoValue>{fish.bait}</InfoValue> </> )}
+          {fish.bitingTime && ( <> <InfoLabel>Время клева:</InfoLabel> <InfoValue>{fish.bitingTime}</InfoValue> </> )}
+        </InfoGrid>
+      </PopupContent>
+    </PopupBackdrop>
+  );
+};
 
 const LocationModal = ({ location, onClose }) => {
+  const [selectedFish, setSelectedFish] = useState(null);
+  const [weatherData, setWeatherData] = useState(null);
+  const [isLoadingForecast, setIsLoadingForecast] = useState(true);
+
+  useEffect(() => {
+    const fetchForecastData = async () => {
+      if (!location.lat || !location.lon) {
+        setIsLoadingForecast(false);
+        return;
+      }
+      
+      const API_KEY = '5da8e53d51f07a4979ba54e627fe23f5'; // <-- ТВОЙ КЛЮЧ УЖЕ ЗДЕСЬ
+      const URL = `https://api.openweathermap.org/data/2.5/forecast?lat=${location.lat}&lon=${location.lon}&appid=${API_KEY}&units=metric&lang=ru`;
+      
+      try {
+        const response = await fetch(URL);
+        if (!response.ok) throw new Error('Weather data fetch failed');
+        const data = await response.json();
+        setWeatherData(data);
+      } catch (error) {
+        console.error("Ошибка при загрузке погоды:", error);
+        setWeatherData(null); // В случае ошибки сбрасываем данные
+      } finally {
+        setIsLoadingForecast(false);
+      }
+    };
+
+    fetchForecastData();
+  }, [location]);
+
   return (
     <ModalBackdrop
       onClick={onClose}
@@ -176,6 +306,8 @@ const LocationModal = ({ location, onClose }) => {
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
+        {selectedFish && <FishInfoPopup fish={selectedFish} onClose={() => setSelectedFish(null)} />}
+
         <ModalHeader src={location.image} alt={location.title} />
         <ModalCloseButton onClick={onClose}>×</ModalCloseButton>
         
@@ -188,7 +320,7 @@ const LocationModal = ({ location, onClose }) => {
             <FishIcons>
               {location.fish && location.fish.length > 0 ? (
                 location.fish.map((fish, index) => (
-                  <FishItem key={index}>
+                  <FishItem key={index} onClick={() => setSelectedFish(fish)}>
                     <FishIcon src={fish.image} alt={fish.name} />
                     <FishName>{fish.name}</FishName>
                   </FishItem>
@@ -202,29 +334,39 @@ const LocationModal = ({ location, onClose }) => {
           </InfoBlock>
 
           <BottomBlock>
-            <div>
+            <WidgetContainer>
               <h4>Карта:</h4>
               <div 
                 style={{ background: '#263238', borderRadius: '4px', height: '100%', minHeight: '250px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 dangerouslySetInnerHTML={{ __html: location.mapEmbedCode || '<div style="color: #78909C; font-weight: 700;">Карта скоро появится</div>' }} 
               />
-            </div>
-            
-            <div>
+            </WidgetContainer>
+            <WidgetContainer>
               <h4>Уровень воды:</h4>
-              {/* --- ИСПОЛЬЗОВАНИЕ НОВОГО ВИДЖЕТА --- */}
               <WaterLevelWidget 
                 level={location.waterLevel}
                 dynamics={location.waterLevelDynamics}
                 lastUpdated={location.waterLevelUpdate}
               />
-            </div>
-            
-            <div>
+            </WidgetContainer>
+            <WidgetContainer>
               <h4>Прогноз погоды:</h4>
               <WeatherWidget lat={location.lat} lon={location.lon} />
-            </div>
+            </WidgetContainer>
           </BottomBlock>
+
+          {/* --- БЛОК С ГРАФИКОМ ПРОГНОЗА --- */}
+          {isLoadingForecast ? (
+            location.fish && location.fish.length > 0 && <div style={{textAlign: 'center', color: '#78909C', marginTop: '40px'}}>Загрузка прогноза клёва...</div>
+          ) : (
+            weatherData && weatherData.list && (
+              <>
+                <BiteForecastChart location={location} weatherList={weatherData.list} />
+                <Disclaimer>Прогноз носит рекомендательный характер и основан на общих факторах.</Disclaimer>
+              </>
+            )
+          )}
+
         </ModalScrollContainer>
         
       </ModalContent>
