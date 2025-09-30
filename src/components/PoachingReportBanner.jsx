@@ -81,7 +81,7 @@ const TelegramButton = styled.a`
 
 const PoachingReportBanner = () => {
   // ЗАМЕНИТЕ 'your_bot_username' НА НАЗВАНИЕ ВАШЕГО БОТА
-  const telegramBotUrl = "https://t.me/your_bot_username";
+  const telegramBotUrl = "https://t.me/Fishguideturkestan_bot";
 
   return (
     <BannerContainer>
