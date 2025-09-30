@@ -10,6 +10,8 @@ import InfoBanner from './components/InfoBanner';
 import LocationsSection from './components/LocationsSection';
 import FishEncyclopedia from './components/FishEncyclopedia';
 import SovietCalendarSection from './components/SovietCalendarSection';
+import LicenseSection from './components/LicenseSection';
+import PoachingReportBanner from './components/PoachingReportBanner';
 import ArticlesSection from './components/ArticlesSection';
 import Footer from './components/Footer';
 import AllLocationsPage from './components/AllLocationsPage';
@@ -41,6 +43,8 @@ const MainPage = () => (
     <FishEncyclopedia />
     <HydrographyAtlas />
     <SovietCalendarSection />
+    <LicenseSection />
+    <PoachingReportBanner />
     <ArticlesSection />
     <Footer />
   </>
