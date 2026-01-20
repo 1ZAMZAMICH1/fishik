@@ -17,6 +17,7 @@ import Footer from './components/Footer';
 import AllLocationsPage from './components/AllLocationsPage';
 import AllArticlesPage from './components/AllArticlesPage';
 import HydrographyAtlas from './components/HydrographyAtlas';
+//import './i18n';//
 
 // Импорты компонентов админки
 import AdminLayout from './components/admin/AdminLayout';

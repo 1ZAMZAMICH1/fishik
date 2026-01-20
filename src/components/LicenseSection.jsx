@@ -73,11 +73,11 @@ const InfoColumn = styled.div`
 const FormColumn = styled.div`
   padding: 2.5rem 3rem;
   background-color: #FDFDFD;
-  border-left: 1px solid #F0F0F0;
+  /* border-left: 1px solid #F0F0F0; */  // <-- ЭТУ СТРОКУ УБРАЛ
 
   @media (max-width: 64rem) {
     border-left: none;
-    border-top: 1px solid #F0F0F0;
+    /* border-top: 1px solid #F0F0F0; */ // <-- И ЭТУ ТОЖЕ
     padding: 2rem 1.5rem;
   }
 `;
